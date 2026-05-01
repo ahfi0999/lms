@@ -1,0 +1,10 @@
+# Docker compose start container with env variables
+services:
+  local-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=local-lms-digitallync-ai
+    ports:
+      - '5432:5432'

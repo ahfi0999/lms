@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PasswordResetTicket {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+}
+
+model EmailVerificationTicket {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+}
+
+model Course {
+  id            Int          @id @default(autoincrement())
+  title         String
+  description   String
+  picture       String
+  archived      Boolean      @default(false)
+  liveLink      String?
+  projectFiles  Attachment[] @relation("projectFiles")
+  resourceFiles Attachment[] @relation("resourceFiles")
+  modulesOrder  Int[]
+  resumeFiles   String[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+  assignments   Assignment[]
+  modules       Module[]
+  users         String[]
+  contentLink   String?
+}
+
+model Module {
+  id        Int      @id @default(autoincrement())
+  title     String
+  courseId  Int
+  course    Course   @relation(fields: [courseId], references: [id])
+  topics    Topic[]
+  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model Topic {
+  id          Int          @id @default(autoincrement())
+  title       String
+  moduleId    Int          @map("modulesId")
+  videoLink   String?
+  module      Module?      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+}
+
+model Assignment {
+  id           Int        @id @default(autoincrement())
+  courseId     Int
+  attachment   Attachment @relation(fields: [attachmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  Course       Course     @relation(fields: [courseId], references: [id])
+  attachmentId Int        @unique
+  user         String
+}
+
+model Attachment {
+  id                    Int         @id @default(autoincrement())
+  title                 String      @db.VarChar(255)
+  file                  String
+  description           String?
+  createdAt             DateTime    @default(now())
+  assignment            Assignment?
+  projectFilesCourse    Course?     @relation("projectFiles", fields: [projectFilesCourseId], references: [id])
+  projectFilesCourseId  Int?
+  resourceFilesCourse   Course?     @relation("resourceFiles", fields: [resourceFilesCourseId], references: [id])
+  resourceFilesCourseId Int?
+  topic                 Topic?      @relation(fields: [topicId], references: [id])
+  topicId               Int?
+}
+
+model AppEvent {
+  id        Int       @id @default(autoincrement())
+  type      AppEventType
+  user      User      @relation(fields: [userId], references: [id])
+  data      Json
+  createdAt DateTime  @default(now())
+  userId    String
+}
+
+enum AppEventType {
+  COURSE_ACCESS
+}
+
+model User {
+  id    String  @id
+  name  String
+  email String
+  Event AppEvent[]
+}
