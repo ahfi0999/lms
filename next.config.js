@@ -39,6 +39,12 @@ module.exports = withBundleAnalyzer({
         port: '',
         pathname: '/**',
       },
+      {
+        hostname: 'konalmsstorage123.blob.core.windows.net',
+        protocol: 'https',
+        port: '',
+        pathname: '/**',
+      },
     ],
     domains: [
       'picsum.photos',
@@ -46,6 +52,7 @@ module.exports = withBundleAnalyzer({
       'blobstoragedl.blob.core.windows.net',
       's.gravatar.com',
       'digitallync.blob.core.windows.net',
+      'konalmsstorage123.blob.core.windows.net',
     ],
   },
 });

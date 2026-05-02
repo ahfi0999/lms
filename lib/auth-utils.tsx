@@ -55,7 +55,7 @@ export const checkAuthorizationForPage = async (
     : [permissions];
 
   const userHasRequiredPermissions = requiredPermissions.every((permission) =>
-    payload.permissions.includes(permission)
+    (payload.permissions || []).includes(permission)
   );
 
   if (!userHasRequiredPermissions) {
