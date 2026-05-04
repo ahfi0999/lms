@@ -38,7 +38,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <UserProvider>
           <QueryClientProvider client={queryClient}>
             <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-              <MantineProvider theme={{ colorScheme, ...theme }} withGlobalStyles withNormalizeCSS>
+              <MantineProvider theme={{ ...theme, colorScheme }} withGlobalStyles withNormalizeCSS>
                 <ModalsProvider modals={modals} modalProps={{ centered: true }}>
                   <RouterTransition />
                   <Component {...pageProps} />

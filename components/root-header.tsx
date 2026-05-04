@@ -1,25 +1,31 @@
 import {
-  Anchor,
+  ActionIcon,
   Burger,
   Button,
-  Center,
   Drawer,
   Group,
   Header,
   MediaQuery,
   Menu,
   Stack,
-  Text,
+  Tooltip,
   createStyles,
+  useMantineColorScheme,
 } from '@mantine/core';
-import { IconExternalLink, IconLogout, IconUser, IconUserCog } from '@tabler/icons-react';
+import {
+  IconCertificate,
+  IconLogout,
+  IconMoon,
+  IconSun,
+  IconUser,
+  IconUserCog,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 import { useDisclosure } from '@mantine/hooks';
 import UserButton from './user-button';
 import Logo from './Logo';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import useRABC from '../hooks/useRABC';
-import account from '../lib/data/account';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -29,7 +35,7 @@ const useStyles = createStyles((theme) => ({
     paddingRight: theme.spacing.xl,
     justifyContent: 'space-between',
     boxShadow: theme.colorScheme === 'dark' ? 'none' : theme.shadows.sm,
-    backgroundColor: 'white',
+    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
   },
   burger: {
     [theme.fn.largerThan('sm')]: {
@@ -37,6 +43,25 @@ const useStyles = createStyles((theme) => ({
     },
   },
 }));
+
+function ColorSchemeToggle() {
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
+  return (
+    <Tooltip label={dark ? 'Switch to light mode' : 'Switch to dark mode'} withArrow>
+      <ActionIcon
+        size="lg"
+        radius="md"
+        variant="light"
+        color={dark ? 'yellow' : 'blue'}
+        onClick={() => toggleColorScheme()}
+        aria-label="Toggle color scheme"
+      >
+        {dark ? <IconSun size={18} /> : <IconMoon size={18} />}
+      </ActionIcon>
+    </Tooltip>
+  );
+}
 
 function RootHeader() {
   const { classes } = useStyles();
@@ -48,6 +73,9 @@ function RootHeader() {
 
   const links = (
     <Stack mt="md">
+      <Group position="center">
+        <ColorSchemeToggle />
+      </Group>
       <Button component={Link} href="/profile" leftIcon={<IconUser />}>
         Update Profile
       </Button>
@@ -61,17 +89,8 @@ function RootHeader() {
     <Header withBorder height={70} className={classes.wrapper}>
       <Logo />
       <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
-        <Group spacing="lg">
-          {account.connectLoginPage ? (
-            <Anchor href={account.connectLoginPage} target="_blank">
-              <Center>
-                <Text component="span" pr="xs">
-                  {account.name} Connect
-                </Text>
-                <IconExternalLink />
-              </Center>
-            </Anchor>
-          ) : null}
+        <Group spacing="md">
+          <ColorSchemeToggle />
           {rabc.check('view:admin_page') ? (
             <Button variant="light" leftIcon={<IconUserCog />} component={Link} href="/admin">
               Admin
@@ -81,11 +100,15 @@ function RootHeader() {
             <Menu.Target>
               <UserButton avatar={user.picture} name={user.name || ''} email={user.email || ''} />
             </Menu.Target>
-            <Menu.Dropdown bg="white">
+            <Menu.Dropdown>
               <Menu.Item component={Link} href="/profile" icon={<IconUser />}>
                 Update Profile
               </Menu.Item>
-              <Menu.Item icon={<IconLogout />} component={Link} href="/api/auth/logout">
+              <Menu.Item component={Link} href="/certificate-request" icon={<IconCertificate />}>
+                Certificate Request
+              </Menu.Item>
+              <Menu.Divider />
+              <Menu.Item icon={<IconLogout />} component={Link} href="/api/auth/logout" color="red">
                 Logout
               </Menu.Item>
             </Menu.Dropdown>

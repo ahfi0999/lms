@@ -64,21 +64,30 @@ interface LinksGroupProps {
   initiallyOpened?: boolean;
   links?: { label: string; link: string }[];
   link?: string;
+  absolute?: boolean;
 }
 
-export function LinksGroup({ icon: Icon, label, initiallyOpened, links, link }: LinksGroupProps) {
+export function LinksGroup({
+  icon: Icon,
+  label,
+  initiallyOpened,
+  links,
+  link,
+  absolute,
+}: LinksGroupProps) {
   const { classes, theme } = useStyles();
   const router = useRouter();
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
+  const resolveHref = (path: string) => (absolute ? path : `/admin${path}`);
   const items = (hasLinks ? links : []).map((link) => (
     <Text
       component={Link}
       className={clsx(classes.link, {
-        [classes.active]: router.pathname === `/admin${link.link}`,
+        [classes.active]: router.pathname === resolveHref(link.link),
       })}
-      href={`/admin${link.link}`}
+      href={resolveHref(link.link)}
       key={link.label}
     >
       {link.label}
@@ -90,9 +99,9 @@ export function LinksGroup({ icon: Icon, label, initiallyOpened, links, link }: 
       {link ? (
         <UnstyledButton
           component={Link}
-          href={`/admin${link}`}
+          href={resolveHref(link)}
           className={clsx(classes.control, {
-            [classes.active]: router.pathname === `/admin${link}`,
+            [classes.active]: router.pathname === resolveHref(link),
           })}
         >
           <Group position="apart" spacing={0}>
