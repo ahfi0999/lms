@@ -12,7 +12,6 @@ const theme: MantineThemeOverride = {
   components: {
     Paper: {
       defaultProps: {
-        bg: 'white',
         shadow: 'sm',
         radius: 'sm',
       },

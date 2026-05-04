@@ -4,7 +4,7 @@ import Logo from './Logo';
 import { LinksGroup } from './NavbarLinksGroup';
 
 const adminLinks = [
-  { label: 'Dashboard', icon: IconPresentationAnalytics, link: '/' },
+  { label: 'Dashboard', icon: IconPresentationAnalytics, link: '/dashboard', absolute: true },
   { label: 'Courses', icon: IconVideo, link: '/courses' },
   {
     label: 'Users',
