@@ -270,25 +270,38 @@ export const getServerSideProps = withPageAuthRequired({
     // Fetch all courses to map enrollments
     const allCourses = await db.course.findMany({ select: { title: true, users: true } });
 
-    // Fetch oldest users to find those closest to 1 year expiration
     let auth0Users: any[] = [];
+    let adminUserIds = new Set<string>();
+
     try {
+      // Fetch all roles to find the Admin role
+      const roles = await authzAdmin.getRoles();
+      const adminRole = roles.find(
+        (r: any) => r.name.toLowerCase() === 'admin' || r.name.toLowerCase() === 'administrator'
+      );
+
+      if (adminRole && adminRole.id) {
+        // Fetch all users who have the Admin role
+        const admins = await authzAdmin.getUsersInRole({ id: adminRole.id });
+        admins.forEach((admin: any) => {
+          if (admin.user_id) adminUserIds.add(admin.user_id);
+        });
+      }
+
       // @ts-ignore
       auth0Users = await authzAdmin.getUsers({
         sort: 'created_at:1',
         per_page: 50,
       });
     } catch (e) {
-      console.error('Error fetching auth0 users:', e);
+      console.error('Error fetching auth0 users or roles:', e);
     }
 
     const now = new Date();
 
-    // Filter out dummy@mail.com or any known admin emails
-    const adminEmailsToExclude = ['dummy@mail.com', 'anirudh@mail.com'];
-
     const usersWithExpiration: ExpiringUser[] = auth0Users
-      .filter((u: any) => !adminEmailsToExclude.includes(u.email))
+      // Filter out any user that has the Admin role
+      .filter((u: any) => !adminUserIds.has(u.user_id))
       .map((u: any) => {
         const createdAt = new Date(u.created_at);
         const expirationDate = new Date(createdAt);

@@ -16,15 +16,8 @@ import Chatwoot from '../components/Chatwoot';
 import '../styles/global.css';
 import account from '../lib/data/account';
 
-export default function App(props: AppProps & { colorScheme: ColorScheme }) {
+export default function App(props: AppProps) {
   const { Component, pageProps } = props;
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme);
-
-  const toggleColorScheme = (value?: ColorScheme) => {
-    const nextColorScheme = value || (colorScheme === 'dark' ? 'light' : 'dark');
-    setColorScheme(nextColorScheme);
-    setCookie('mantine-color-scheme', nextColorScheme, { maxAge: 60 * 60 * 24 * 30 });
-  };
 
   return (
     <>
@@ -37,15 +30,17 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
       <main>
         <UserProvider>
           <QueryClientProvider client={queryClient}>
-            <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-              <MantineProvider theme={{ ...theme, colorScheme }} withGlobalStyles withNormalizeCSS>
-                <ModalsProvider modals={modals} modalProps={{ centered: true }}>
-                  <RouterTransition />
-                  <Component {...pageProps} />
-                  <Notifications position="top-right" />
-                </ModalsProvider>
-              </MantineProvider>
-            </ColorSchemeProvider>
+            <MantineProvider
+              theme={{ ...theme, colorScheme: 'light' }}
+              withGlobalStyles
+              withNormalizeCSS
+            >
+              <ModalsProvider modals={modals} modalProps={{ centered: true }}>
+                <RouterTransition />
+                <Component {...pageProps} />
+                <Notifications position="top-right" />
+              </ModalsProvider>
+            </MantineProvider>
             <ReactQueryDevtools initialIsOpen={false} />
             <Chatwoot />
           </QueryClientProvider>
@@ -59,6 +54,5 @@ App.getInitialProps = async (appContext: AppContext) => {
   const appProps = await NextApp.getInitialProps(appContext);
   return {
     ...appProps,
-    colorScheme: getCookie('mantine-color-scheme', appContext.ctx) || 'dark',
   };
 };

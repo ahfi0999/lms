@@ -10,16 +10,8 @@ import {
   Stack,
   Tooltip,
   createStyles,
-  useMantineColorScheme,
 } from '@mantine/core';
-import {
-  IconCertificate,
-  IconLogout,
-  IconMoon,
-  IconSun,
-  IconUser,
-  IconUserCog,
-} from '@tabler/icons-react';
+import { IconCertificate, IconLogout, IconUser, IconUserCog } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useDisclosure } from '@mantine/hooks';
 import UserButton from './user-button';
@@ -44,25 +36,6 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function ColorSchemeToggle() {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const dark = colorScheme === 'dark';
-  return (
-    <Tooltip label={dark ? 'Switch to light mode' : 'Switch to dark mode'} withArrow>
-      <ActionIcon
-        size="lg"
-        radius="md"
-        variant="light"
-        color={dark ? 'yellow' : 'blue'}
-        onClick={() => toggleColorScheme()}
-        aria-label="Toggle color scheme"
-      >
-        {dark ? <IconSun size={18} /> : <IconMoon size={18} />}
-      </ActionIcon>
-    </Tooltip>
-  );
-}
-
 function RootHeader() {
   const { classes } = useStyles();
   const [opened, { toggle }] = useDisclosure(false);
@@ -73,9 +46,7 @@ function RootHeader() {
 
   const links = (
     <Stack mt="md">
-      <Group position="center">
-        <ColorSchemeToggle />
-      </Group>
+      <Group position="center"></Group>
       <Button component={Link} href="/profile" leftIcon={<IconUser />}>
         Update Profile
       </Button>
@@ -90,7 +61,6 @@ function RootHeader() {
       <Logo />
       <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
         <Group spacing="md">
-          <ColorSchemeToggle />
           {rabc.check('view:admin_page') ? (
             <Button variant="light" leftIcon={<IconUserCog />} component={Link} href="/admin">
               Admin
