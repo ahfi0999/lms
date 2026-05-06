@@ -392,6 +392,19 @@ export const getServerSideProps = withPageAuthRequired({
     try {
       const session = await getSessionOrThrow(context.req, context.res);
       user = session.user;
+
+      try {
+        await checkAuthorizationForPage(context, 'admin:dashboards');
+        return {
+          redirect: {
+            destination: '/admin',
+            permanent: false,
+          },
+        };
+      } catch (e) {
+        // User is not an admin, continue loading the learner dashboard
+      }
+
       await checkAuthorizationForPage(context, 'read:mycourses');
     } catch (error) {
       // redirected to login

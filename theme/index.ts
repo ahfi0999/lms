@@ -1,12 +1,12 @@
 import { MantineThemeOverride } from '@mantine/core';
-import { sourceCodeProFontStyle, sourceSansProFontStyle } from '../lib/font';
+import { monospaceFontStyle, primaryFontStyle } from '../lib/font';
 
 const theme: MantineThemeOverride = {
   colorScheme: 'light',
-  fontFamily: sourceSansProFontStyle.fontFamily,
-  fontFamilyMonospace: sourceCodeProFontStyle.fontFamily,
+  fontFamily: primaryFontStyle.fontFamily,
+  fontFamilyMonospace: monospaceFontStyle.fontFamily,
   headings: {
-    fontFamily: sourceSansProFontStyle.fontFamily,
+    fontFamily: primaryFontStyle.fontFamily,
   },
   fontSizes: {},
   components: {

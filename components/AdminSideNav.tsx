@@ -1,10 +1,10 @@
 import { Navbar, Group, ScrollArea, createStyles, rem } from '@mantine/core';
-import { IconPresentationAnalytics, IconTools, IconUsers, IconVideo } from '@tabler/icons-react';
+import { IconHome, IconTools, IconUsers, IconVideo } from '@tabler/icons-react';
 import Logo from './Logo';
 import { LinksGroup } from './NavbarLinksGroup';
 
 const adminLinks = [
-  { label: 'Dashboard', icon: IconPresentationAnalytics, link: '/dashboard', absolute: true },
+  { label: 'Dashboard', icon: IconHome, link: '/admin', absolute: true },
   { label: 'Courses', icon: IconVideo, link: '/courses' },
   {
     label: 'Users',
@@ -19,6 +19,10 @@ const adminLinks = [
         label: 'Manage User',
         link: '/learners/manage-user',
       },
+      {
+        label: 'Create User',
+        link: '/learners/create-user',
+      },
     ],
   },
   {
@@ -31,8 +35,9 @@ const adminLinks = [
 
 const useStyles = createStyles((theme) => ({
   navbar: {
-    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
     paddingBottom: 0,
+    borderRight: 'none',
   },
 
   header: {
@@ -68,7 +73,7 @@ function AdminSideNav() {
   const links = adminLinks.map((item) => <LinksGroup {...item} key={item.label} />);
 
   return (
-    <Navbar height={800} width={{ sm: 300 }} p="md" className={classes.navbar}>
+    <Navbar height="100vh" width={{ sm: 300 }} p="md" className={classes.navbar}>
       <Navbar.Section className={classes.header}>
         <Group position="apart">
           <Logo width={200} height={60} />

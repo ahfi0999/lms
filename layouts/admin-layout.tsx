@@ -29,7 +29,7 @@ function AdminLayout(props: AdminLayoutProps) {
 
   return (
     <AppShell
-      aside={<AdminSideNav />}
+      navbar={<AdminSideNav />}
       layout="alt"
       header={<AdminHeader title={props.title} breadcrumbs={props.breadcrumbs} />}
     >
