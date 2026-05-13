@@ -11,6 +11,7 @@ type AdminLayoutProps = {
   children: React.ReactNode;
   title?: string;
   breadcrumbs?: { title: string; href: string }[];
+  noPadding?: boolean;
 };
 
 function AdminLayout(props: AdminLayoutProps) {
@@ -37,8 +38,8 @@ function AdminLayout(props: AdminLayoutProps) {
       {/* Right column: header + scrollable content */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
         <AdminHeader />
-        <Box sx={{ flex: 1, overflowY: 'auto', backgroundColor: '#f8f9fa' }}>
-          <Box p="xl">{props.children}</Box>
+        <Box sx={{ flex: 1, overflow: 'hidden', backgroundColor: props.noPadding ? 'white' : '#f8f9fa', display: 'flex', flexDirection: 'column' }}>
+          {props.noPadding ? props.children : <Box sx={{ flex: 1, overflowY: 'auto' }} p="xl">{props.children}</Box>}
         </Box>
       </Box>
     </Box>

@@ -19,12 +19,10 @@ import {
   IconMail,
   IconTemplate,
   IconMailbox,
-  IconSpeakerphone,
   IconRefreshAlert,
   IconDatabase,
   IconUserShield,
   IconSettings,
-  IconFileAnalytics,
   IconChevronLeft,
   IconChevronRight,
   IconChevronDown,
@@ -146,7 +144,6 @@ const sections: NavSection[] = [
       { label: 'Email Center', icon: IconMail, href: '/admin/email-center' },
       { label: 'Templates', icon: IconTemplate, href: '/admin/templates' },
       { label: 'Email Logs', icon: IconMailbox, href: '/admin/email-logs' },
-      { label: 'Announcements', icon: IconSpeakerphone, href: '/admin/announcements' },
     ],
   },
   {
@@ -161,7 +158,6 @@ const sections: NavSection[] = [
     items: [
       { label: 'Users & Roles', icon: IconUserShield, href: '/admin/users-roles' },
       { label: 'Settings', icon: IconSettings, href: '/admin/settings' },
-      { label: 'Audit Logs', icon: IconFileAnalytics, href: '/admin/audit-logs' },
     ],
   },
 ];

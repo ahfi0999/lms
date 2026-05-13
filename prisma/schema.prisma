@@ -99,9 +99,82 @@ enum AppEventType {
   COURSE_ACCESS
 }
 
+model EmailLog {
+  id        Int            @id @default(autoincrement())
+  to        String
+  subject   String
+  body      String
+  template  String?
+  sentBy    String
+  status    EmailLogStatus @default(SENT)
+  error     String?
+  createdAt DateTime       @default(now())
+}
+
+enum EmailLogStatus {
+  SENT
+  FAILED
+}
+
+model SyncLog {
+  id          Int           @id @default(autoincrement())
+  type        String
+  triggeredBy String
+  status      SyncLogStatus
+  synced      Int           @default(0)
+  failed      Int           @default(0)
+  duration    Int           @default(0)
+  error       String?
+  records     SyncLogRecord[]
+  createdAt   DateTime      @default(now())
+}
+
+model SyncLogRecord {
+  id        Int      @id @default(autoincrement())
+  syncLogId Int
+  syncLog   SyncLog  @relation(fields: [syncLogId], references: [id], onDelete: Cascade)
+  email     String
+  name      String?
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+enum SyncLogStatus {
+  SUCCESS
+  PARTIAL
+  FAILED
+}
+
 model User {
   id    String  @id
   name  String
   email String
   Event AppEvent[]
+}
+
+model AppSettings {
+  id                     Int      @id @default(1)
+  // General
+  platformName           String   @default("LMS Platform")
+  supportEmail           String   @default("")
+  timezone               String   @default("UTC")
+  maintenanceMode        Boolean  @default(false)
+  maintenanceMessage     String   @default("We are currently undergoing scheduled maintenance. Please check back soon.")
+  // Enrollment
+  selfEnrollment         Boolean  @default(true)
+  defaultBatchCapacity   Int      @default(30)
+  waitlistEnabled        Boolean  @default(false)
+  // Notifications
+  notifyOnEnrollment     Boolean  @default(true)
+  notifyOnCompletion     Boolean  @default(true)
+  notifyOnCertificate    Boolean  @default(true)
+  adminAlertEmail        String   @default("")
+  // Certificates
+  certificateIssuer      String   @default("")
+  autoIssueCertificate   Boolean  @default(false)
+  // Security
+  allowedDomains         String[] @default([])
+  sessionTimeoutMinutes  Int      @default(1440)
+  updatedAt              DateTime @default(now()) @updatedAt
 }
