@@ -49,7 +49,7 @@ import { notify } from '../../lib/notify';
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const FW_GREEN = '#25c16f';
-const FW_DARK  = '#0e4e32';
+const FW_DARK = '#0e4e32';
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -92,25 +92,74 @@ const useStyles = createStyles((theme) => ({
 // ─── Mock sync history ────────────────────────────────────────────────────────
 
 const SYNC_HISTORY = [
-  { id: 1, type: 'Full Sync',        status: 'success', synced: 482, failed: 0,  duration: '1m 12s', time: '2026-05-13T10:28:00' },
-  { id: 2, type: 'Enrollment Sync',  status: 'success', synced: 15,  failed: 0,  duration: '8s',     time: '2026-05-13T08:00:00' },
-  { id: 3, type: 'Enrollment Sync',  status: 'partial', synced: 23,  failed: 2,  duration: '11s',    time: '2026-05-12T08:00:00' },
-  { id: 4, type: 'Full Sync',        status: 'success', synced: 460, failed: 0,  duration: '58s',    time: '2026-05-11T03:00:00' },
-  { id: 5, type: 'Enrollment Sync',  status: 'failed',  synced: 0,   failed: 8,  duration: '3s',     time: '2026-05-10T08:00:00' },
+  {
+    id: 1,
+    type: 'Full Sync',
+    status: 'success',
+    synced: 482,
+    failed: 0,
+    duration: '1m 12s',
+    time: '2026-05-13T10:28:00',
+  },
+  {
+    id: 2,
+    type: 'Enrollment Sync',
+    status: 'success',
+    synced: 15,
+    failed: 0,
+    duration: '8s',
+    time: '2026-05-13T08:00:00',
+  },
+  {
+    id: 3,
+    type: 'Enrollment Sync',
+    status: 'partial',
+    synced: 23,
+    failed: 2,
+    duration: '11s',
+    time: '2026-05-12T08:00:00',
+  },
+  {
+    id: 4,
+    type: 'Full Sync',
+    status: 'success',
+    synced: 460,
+    failed: 0,
+    duration: '58s',
+    time: '2026-05-11T03:00:00',
+  },
+  {
+    id: 5,
+    type: 'Enrollment Sync',
+    status: 'failed',
+    synced: 0,
+    failed: 8,
+    duration: '3s',
+    time: '2026-05-10T08:00:00',
+  },
 ];
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleString([], {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function SyncStatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: string; label: string }> = {
     success: { color: 'green', label: 'Success' },
     partial: { color: 'yellow', label: 'Partial' },
-    failed:  { color: 'red',   label: 'Failed'  },
+    failed: { color: 'red', label: 'Failed' },
   };
   const m = map[status] ?? { color: 'gray', label: status };
-  return <Badge color={m.color} variant="light" size="sm">{m.label}</Badge>;
+  return (
+    <Badge color={m.color} variant="light" size="sm">
+      {m.label}
+    </Badge>
+  );
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -119,26 +168,26 @@ export default function FreshworksCRMPage() {
   const { classes } = useStyles();
 
   // Connection state
-  const [connected, setConnected]     = useState(true);
-  const [apiKey, setApiKey]           = useState('fw_live_••••••••••••••••••••ab4f');
-  const [domain, setDomain]           = useState('xaktinow.freshworks.com');
-  const [showKey, setShowKey]         = useState(false);
-  const [testing, setTesting]         = useState(false);
-  const [testResult, setTestResult]   = useState<'success' | 'fail' | null>(null);
-  const [saving, setSaving]           = useState(false);
+  const [connected, setConnected] = useState(true);
+  const [apiKey, setApiKey] = useState('fw_live_••••••••••••••••••••ab4f');
+  const [domain, setDomain] = useState('xaktinow.freshworks.com');
+  const [showKey, setShowKey] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<'success' | 'fail' | null>(null);
+  const [saving, setSaving] = useState(false);
   const [disconnectModal, setDisconnectModal] = useState(false);
 
   // Sync controls
-  const [autoSync, setAutoSync]           = useState(true);
+  const [autoSync, setAutoSync] = useState(true);
   const [syncFrequency, setSyncFrequency] = useState('hourly');
-  const [syncing, setSyncing]             = useState(false);
-  const [syncProgress, setSyncProgress]   = useState(0);
+  const [syncing, setSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState(0);
 
   const [syncOptions, setSyncOptions] = useState({
-    newLearners:      true,
-    enrollments:      true,
-    completions:      true,
-    profileUpdates:   false,
+    newLearners: true,
+    enrollments: true,
+    completions: true,
+    profileUpdates: false,
   });
 
   const toggleSyncOption = (key: keyof typeof syncOptions) =>
@@ -226,15 +275,21 @@ export default function FreshworksCRMPage() {
         <Group spacing="sm">
           <Box
             sx={{
-              width: 40, height: 40, borderRadius: 10,
+              width: 40,
+              height: 40,
+              borderRadius: 10,
               backgroundColor: FW_GREEN,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <IconPlugConnected size={22} color="white" />
           </Box>
           <Box>
-            <Title order={3} weight={700}>Freshworks CRM</Title>
+            <Title order={3} weight={700}>
+              Freshworks CRM
+            </Title>
             <Text size="sm" color="dimmed" mt={2}>
               Sync learners and enrollment data with your Freshworks CRM.
             </Text>
@@ -246,7 +301,9 @@ export default function FreshworksCRMPage() {
             radius="xl"
             color={connected ? 'green' : 'gray'}
             variant="light"
-            leftSection={connected ? <IconCircleCheck size={14} /> : <IconPlugConnectedX size={14} />}
+            leftSection={
+              connected ? <IconCircleCheck size={14} /> : <IconPlugConnectedX size={14} />
+            }
           >
             {connected ? 'Connected' : 'Disconnected'}
           </Badge>
@@ -272,46 +329,72 @@ export default function FreshworksCRMPage() {
         <Box className={classes.statCard}>
           <Group spacing="xs" mb={6}>
             <IconUsers size={16} color={FW_GREEN} />
-            <Text size="xs" color="dimmed" weight={600} sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <Text
+              size="xs"
+              color="dimmed"
+              weight={600}
+              sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}
+            >
               Total Synced
             </Text>
           </Group>
           <Text size="xl" weight={700} color={connected ? 'dark' : 'dimmed'}>
             {connected ? '482' : '—'}
           </Text>
-          <Text size="xs" color="dimmed" mt={2}>learners in Freshworks</Text>
+          <Text size="xs" color="dimmed" mt={2}>
+            learners in Freshworks
+          </Text>
         </Box>
 
         <Box className={classes.statCard}>
           <Group spacing="xs" mb={6}>
             <IconRefresh size={16} color="#1a73e8" />
-            <Text size="xs" color="dimmed" weight={600} sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <Text
+              size="xs"
+              color="dimmed"
+              weight={600}
+              sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}
+            >
               Last Sync
             </Text>
           </Group>
           <Text size="xl" weight={700} color={connected ? 'dark' : 'dimmed'}>
             {connected ? '2m ago' : '—'}
           </Text>
-          <Text size="xs" color="dimmed" mt={2}>13 May 2026, 10:28 AM</Text>
+          <Text size="xs" color="dimmed" mt={2}>
+            13 May 2026, 10:28 AM
+          </Text>
         </Box>
 
         <Box className={classes.statCard}>
           <Group spacing="xs" mb={6}>
             <IconShieldCheck size={16} color="green" />
-            <Text size="xs" color="dimmed" weight={600} sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <Text
+              size="xs"
+              color="dimmed"
+              weight={600}
+              sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}
+            >
               Success Rate
             </Text>
           </Group>
           <Text size="xl" weight={700} color={connected ? 'green' : 'dimmed'}>
             {connected ? '98.5%' : '—'}
           </Text>
-          <Text size="xs" color="dimmed" mt={2}>across last 30 syncs</Text>
+          <Text size="xs" color="dimmed" mt={2}>
+            across last 30 syncs
+          </Text>
         </Box>
 
         <Box className={classes.statCard}>
           <Group spacing="xs" mb={6}>
             <IconWifi size={16} color={autoSync && connected ? FW_GREEN : '#9aa0a6'} />
-            <Text size="xs" color="dimmed" weight={600} sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <Text
+              size="xs"
+              color="dimmed"
+              weight={600}
+              sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}
+            >
               Auto Sync
             </Text>
           </Group>
@@ -319,7 +402,11 @@ export default function FreshworksCRMPage() {
             {autoSync && connected ? 'On' : 'Off'}
           </Text>
           <Text size="xs" color="dimmed" mt={2}>
-            {autoSync && connected ? `Every ${syncFrequency === 'hourly' ? 'hour' : syncFrequency === '6h' ? '6 hours' : 'day'}` : 'Disabled'}
+            {autoSync && connected
+              ? `Every ${
+                  syncFrequency === 'hourly' ? 'hour' : syncFrequency === '6h' ? '6 hours' : 'day'
+                }`
+              : 'Disabled'}
           </Text>
         </Box>
       </Group>
@@ -327,7 +414,6 @@ export default function FreshworksCRMPage() {
       <Group align="flex-start" spacing="lg" sx={{ flexWrap: 'nowrap' }}>
         {/* ── Left column ─────────────────────────────────────────────── */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-
           {/* Connection & API Settings */}
           <Box className={classes.card} mb="lg">
             <Group spacing="xs" mb="md">
@@ -338,18 +424,26 @@ export default function FreshworksCRMPage() {
 
             <Stack spacing="md">
               <Box>
-                <Text size="sm" weight={500} mb={6}>Freshworks Domain</Text>
+                <Text size="sm" weight={500} mb={6}>
+                  Freshworks Domain
+                </Text>
                 <TextInput
                   placeholder="yourcompany.freshworks.com"
                   value={domain}
                   onChange={(e) => setDomain(e.currentTarget.value)}
-                  icon={<Text size="xs" color="dimmed">https://</Text>}
+                  icon={
+                    <Text size="xs" color="dimmed">
+                      https://
+                    </Text>
+                  }
                   description="Your Freshworks CRM subdomain"
                 />
               </Box>
 
               <Box>
-                <Text size="sm" weight={500} mb={6}>API Key</Text>
+                <Text size="sm" weight={500} mb={6}>
+                  API Key
+                </Text>
                 <PasswordInput
                   placeholder="fw_live_••••••••••••••••••••"
                   value={apiKey}
@@ -411,10 +505,7 @@ export default function FreshworksCRMPage() {
             </Group>
             <Divider mb="md" />
 
-            <Box
-              component="table"
-              sx={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}
-            >
+            <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr>
                   {['Type', 'Synced', 'Failed', 'Duration', 'Time', 'Status'].map((h) => (
@@ -422,9 +513,13 @@ export default function FreshworksCRMPage() {
                       component="th"
                       key={h}
                       sx={{
-                        textAlign: 'left', padding: '6px 8px',
-                        color: '#5f6368', fontWeight: 600, fontSize: 11,
-                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                        textAlign: 'left',
+                        padding: '6px 8px',
+                        color: '#5f6368',
+                        fontWeight: 600,
+                        fontSize: 11,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
                         borderBottom: '1px solid #e0e0e0',
                       }}
                     >
@@ -436,22 +531,48 @@ export default function FreshworksCRMPage() {
               <tbody>
                 {SYNC_HISTORY.map((row) => (
                   <tr key={row.id}>
-                    <Box component="td" sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}>
+                    <Box
+                      component="td"
+                      sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}
+                    >
                       <Text size="sm">{row.type}</Text>
                     </Box>
-                    <Box component="td" sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}>
-                      <Text size="sm" color="green" weight={500}>{row.synced}</Text>
+                    <Box
+                      component="td"
+                      sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}
+                    >
+                      <Text size="sm" color="green" weight={500}>
+                        {row.synced}
+                      </Text>
                     </Box>
-                    <Box component="td" sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}>
-                      <Text size="sm" color={row.failed > 0 ? 'red' : 'dimmed'}>{row.failed}</Text>
+                    <Box
+                      component="td"
+                      sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}
+                    >
+                      <Text size="sm" color={row.failed > 0 ? 'red' : 'dimmed'}>
+                        {row.failed}
+                      </Text>
                     </Box>
-                    <Box component="td" sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}>
-                      <Text size="sm" color="dimmed">{row.duration}</Text>
+                    <Box
+                      component="td"
+                      sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}
+                    >
+                      <Text size="sm" color="dimmed">
+                        {row.duration}
+                      </Text>
                     </Box>
-                    <Box component="td" sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}>
-                      <Text size="xs" color="dimmed">{formatTime(row.time)}</Text>
+                    <Box
+                      component="td"
+                      sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}
+                    >
+                      <Text size="xs" color="dimmed" suppressHydrationWarning>
+                        {formatTime(row.time)}
+                      </Text>
                     </Box>
-                    <Box component="td" sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}>
+                    <Box
+                      component="td"
+                      sx={{ padding: '10px 8px', borderBottom: '1px solid #f1f3f4' }}
+                    >
                       <SyncStatusBadge status={row.status} />
                     </Box>
                   </tr>
@@ -463,7 +584,6 @@ export default function FreshworksCRMPage() {
 
         {/* ── Right column ─────────────────────────────────────────────── */}
         <Box sx={{ width: 320, flexShrink: 0 }}>
-
           {/* Sync Now */}
           <Box className={classes.card} mb="lg">
             <Group spacing="xs" mb="md">
@@ -479,8 +599,12 @@ export default function FreshworksCRMPage() {
             {syncing && (
               <Box mb="md">
                 <Group position="apart" mb={4}>
-                  <Text size="xs" color="dimmed">Syncing learners…</Text>
-                  <Text size="xs" color="dimmed">{syncProgress}%</Text>
+                  <Text size="xs" color="dimmed">
+                    Syncing learners…
+                  </Text>
+                  <Text size="xs" color="dimmed">
+                    {syncProgress}%
+                  </Text>
                 </Group>
                 <Progress value={syncProgress} color={FW_GREEN} animate size="sm" radius="xl" />
               </Box>
@@ -489,7 +613,9 @@ export default function FreshworksCRMPage() {
             <Button
               fullWidth
               size="md"
-              leftIcon={syncing ? <Loader size={14} color="white" /> : <IconRefreshAlert size={16} />}
+              leftIcon={
+                syncing ? <Loader size={14} color="white" /> : <IconRefreshAlert size={16} />
+              }
               loading={syncing}
               disabled={!connected}
               onClick={handleSyncNow}
@@ -528,15 +654,17 @@ export default function FreshworksCRMPage() {
             </Box>
 
             <Box mt="sm">
-              <Text size="sm" weight={500} mb={6}>Sync Frequency</Text>
+              <Text size="sm" weight={500} mb={6}>
+                Sync Frequency
+              </Text>
               <Select
                 value={syncFrequency}
                 onChange={(v) => setSyncFrequency(v ?? 'hourly')}
                 disabled={!autoSync || !connected}
                 data={[
                   { value: 'hourly', label: 'Every Hour' },
-                  { value: '6h',     label: 'Every 6 Hours' },
-                  { value: 'daily',  label: 'Once Daily' },
+                  { value: '6h', label: 'Every 6 Hours' },
+                  { value: 'daily', label: 'Once Daily' },
                 ]}
               />
             </Box>
@@ -552,9 +680,9 @@ export default function FreshworksCRMPage() {
 
             <Stack spacing="xs">
               {[
-                { key: 'newLearners',    label: 'New Learner Registrations' },
-                { key: 'enrollments',    label: 'Course Enrollments' },
-                { key: 'completions',    label: 'Course Completions' },
+                { key: 'newLearners', label: 'New Learner Registrations' },
+                { key: 'enrollments', label: 'Course Enrollments' },
+                { key: 'completions', label: 'Course Completions' },
                 { key: 'profileUpdates', label: 'Profile Updates' },
               ].map(({ key, label }) => (
                 <Checkbox
@@ -598,12 +726,18 @@ export default function FreshworksCRMPage() {
         size="sm"
       >
         <Text size="sm" color="dimmed" mb="xl">
-          This will stop all automatic syncing. Your existing contacts in Freshworks will not be deleted.
-          You can reconnect at any time.
+          This will stop all automatic syncing. Your existing contacts in Freshworks will not be
+          deleted. You can reconnect at any time.
         </Text>
         <Group position="right">
-          <Button variant="subtle" color="gray" onClick={() => setDisconnectModal(false)}>Cancel</Button>
-          <Button color="red" leftIcon={<IconPlugConnectedX size={14} />} onClick={handleDisconnect}>
+          <Button variant="subtle" color="gray" onClick={() => setDisconnectModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            color="red"
+            leftIcon={<IconPlugConnectedX size={14} />}
+            onClick={handleDisconnect}
+          >
             Yes, Disconnect
           </Button>
         </Group>
