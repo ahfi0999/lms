@@ -153,6 +153,19 @@ model User {
   Event AppEvent[]
 }
 
+model EmailAccount {
+  id           Int      @id @default(autoincrement())
+  label        String
+  email        String   @unique
+  imapHost     String   @default("imap.gmail.com")
+  imapPort     Int      @default(993)
+  smtpHost     String   @default("smtp.gmail.com")
+  smtpPort     Int      @default(587)
+  appPassword  String
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
 model AppSettings {
   id                     Int      @id @default(1)
   // General

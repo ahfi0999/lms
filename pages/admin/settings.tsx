@@ -12,8 +12,10 @@ import {
   Group,
   Loader,
   Center,
+  Modal,
   NumberInput,
   Paper,
+  PasswordInput,
   rem,
   Select,
   Stack,
@@ -30,9 +32,11 @@ import {
   IconBell,
   IconCertificate,
   IconCheck,
+  IconCircleCheck,
   IconGlobe,
   IconInfoCircle,
   IconLock,
+  IconMail,
   IconPlus,
   IconRefreshAlert,
   IconSettings,
@@ -147,7 +151,18 @@ const useStyles = createStyles((theme) => ({
 
 // ─── Nav sections ─────────────────────────────────────────────────────────────
 
-type SectionId = 'general' | 'enrollment' | 'notifications' | 'certificates' | 'security' | 'danger';
+type SectionId = 'general' | 'enrollment' | 'notifications' | 'certificates' | 'security' | 'accounts' | 'danger';
+
+type EmailAccount = {
+  id: number;
+  label: string;
+  email: string;
+  isDefault: boolean;
+  imapHost: string;
+  imapPort: number;
+  smtpHost: string;
+  smtpPort: number;
+};
 
 const NAV: { id: SectionId; label: string; icon: React.FC<any> }[] = [
   { id: 'general',       label: 'General',       icon: IconSettings      },
@@ -155,6 +170,7 @@ const NAV: { id: SectionId; label: string; icon: React.FC<any> }[] = [
   { id: 'notifications', label: 'Notifications',  icon: IconBell          },
   { id: 'certificates',  label: 'Certificates',   icon: IconCertificate   },
   { id: 'security',      label: 'Security',       icon: IconShieldCheck   },
+  { id: 'accounts',      label: 'Email Accounts', icon: IconMail          },
   { id: 'danger',        label: 'Danger Zone',    icon: IconAlertTriangle },
 ];
 
@@ -191,9 +207,46 @@ function SettingsPage() {
   const [domainInput, setDomainInput] = useState('');
   const [purging, setPurging] = useState(false);
 
+  // Email accounts
+  const [addAccountOpen, setAddAccountOpen] = useState(false);
+  const [acctLabel, setAcctLabel] = useState('');
+  const [acctEmail, setAcctEmail] = useState('');
+  const [acctPassword, setAcctPassword] = useState('');
+  const [acctDefault, setAcctDefault] = useState(false);
+
   const { data: settings, isLoading } = useQuery<Settings>({
     queryKey: ['settings'],
     queryFn: () => http.get('/api/settings').then((r) => r.data),
+  });
+
+  const { data: accounts = [], isLoading: accountsLoading } = useQuery<EmailAccount[]>({
+    queryKey: ['email-accounts'],
+    queryFn: () => http.get('/api/email-accounts').then((r) => r.data),
+  });
+
+  const addAccountMutation = useMutation({
+    mutationFn: (data: object) => http.post('/api/email-accounts', data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['email-accounts'] });
+      notify({ type: 'success', message: 'Account connected successfully.' });
+      setAddAccountOpen(false);
+      setAcctLabel(''); setAcctEmail(''); setAcctPassword(''); setAcctDefault(false);
+    },
+    onError: () => notify({ type: 'error', message: 'Failed to connect account.' }),
+  });
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: (id: number) => http.delete(`/api/email-accounts/${id}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['email-accounts'] });
+      notify({ type: 'success', message: 'Account removed.' });
+    },
+    onError: () => notify({ type: 'error', message: 'Failed to remove account.' }),
+  });
+
+  const setDefaultMutation = useMutation({
+    mutationFn: (id: number) => http.patch(`/api/email-accounts/${id}`, { isDefault: true }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['email-accounts'] }),
   });
 
   useEffect(() => {
@@ -574,9 +627,160 @@ function SettingsPage() {
                 </Stack>
               </Box>
             )}
+
+            {/* ── Email Accounts ─────────────────────────────── */}
+            {active === 'accounts' && (
+              <Box className={classes.section}>
+                <Group position="apart" mb="xs">
+                  <Box>
+                    <Text className={classes.sectionTitle}>Connected Email Accounts</Text>
+                    <Text className={classes.sectionDesc}>
+                      Google Workspace mailboxes used by the Email Centre. The default account is used for sending and reading emails.
+                    </Text>
+                  </Box>
+                  <Button
+                    leftIcon={<IconPlus size={14} />}
+                    size="sm"
+                    onClick={() => setAddAccountOpen(true)}
+                  >
+                    Add account
+                  </Button>
+                </Group>
+
+                {accountsLoading ? (
+                  <Center py="md"><Loader size="sm" /></Center>
+                ) : accounts.length === 0 ? (
+                  <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
+                    No accounts connected yet. Add a Google Workspace account to enable the Email Centre.
+                  </Alert>
+                ) : (
+                  <Stack spacing="sm" mt="md">
+                    {accounts.map((acct) => (
+                      <Box
+                        key={acct.id}
+                        sx={(t) => ({
+                          border: `1px solid ${acct.isDefault ? t.colors.blue[3] : t.colors.gray[2]}`,
+                          borderRadius: t.radius.md,
+                          padding: `${rem(14)} ${rem(16)}`,
+                          backgroundColor: acct.isDefault ? t.colors.blue[0] : 'white',
+                        })}
+                      >
+                        <Group position="apart" noWrap>
+                          <Group spacing="sm" noWrap>
+                            <ThemeIcon color={acct.isDefault ? 'blue' : 'gray'} variant="light" size="md" radius="xl">
+                              <IconMail size={14} />
+                            </ThemeIcon>
+                            <Box>
+                              <Group spacing={6}>
+                                <Text size="sm" weight={600}>{acct.label}</Text>
+                                {acct.isDefault && (
+                                  <Badge size="xs" color="blue" variant="filled">Default</Badge>
+                                )}
+                              </Group>
+                              <Text size="xs" color="dimmed">{acct.email}</Text>
+                              <Text size="xs" color="dimmed">{acct.imapHost}:{acct.imapPort} · {acct.smtpHost}:{acct.smtpPort}</Text>
+                            </Box>
+                          </Group>
+                          <Group spacing={6} noWrap>
+                            {!acct.isDefault && (
+                              <Tooltip label="Set as default">
+                                <Button
+                                  size="xs"
+                                  variant="subtle"
+                                  color="blue"
+                                  onClick={() => setDefaultMutation.mutate(acct.id)}
+                                >
+                                  Set default
+                                </Button>
+                              </Tooltip>
+                            )}
+                            <Tooltip label="Remove account">
+                              <ActionIcon
+                                color="red"
+                                variant="subtle"
+                                size="sm"
+                                onClick={() => deleteAccountMutation.mutate(acct.id)}
+                              >
+                                <IconTrash size={14} />
+                              </ActionIcon>
+                            </Tooltip>
+                          </Group>
+                        </Group>
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
+
+                <Alert icon={<IconInfoCircle size={16} />} color="gray" variant="light" mt="xl">
+                  <Text size="xs">
+                    <strong>Setup required:</strong> In Gmail → Settings → Forwarding and POP/IMAP → enable IMAP.
+                    Then generate an App Password at <strong>myaccount.google.com/security</strong> (requires 2-Step Verification).
+                  </Text>
+                </Alert>
+              </Box>
+            )}
           </Paper>
         </Group>
       </Box>
+
+      {/* ── Add Account Modal ─────────────────────────────────── */}
+      <Modal
+        opened={addAccountOpen}
+        onClose={() => setAddAccountOpen(false)}
+        title={<Text weight={600}>Connect Google Workspace Account</Text>}
+        size="md"
+      >
+        <Stack spacing="sm">
+          <TextInput
+            label="Label"
+            placeholder="e.g. Support, Sales"
+            value={acctLabel}
+            onChange={(e) => setAcctLabel(e.currentTarget.value)}
+            required
+          />
+          <TextInput
+            label="Email address"
+            placeholder="support@yourcompany.com"
+            value={acctEmail}
+            onChange={(e) => setAcctEmail(e.currentTarget.value)}
+            required
+          />
+          <PasswordInput
+            label="App Password"
+            description="16-character App Password from myaccount.google.com/security — not your regular Gmail password."
+            placeholder="xxxx xxxx xxxx xxxx"
+            value={acctPassword}
+            onChange={(e) => setAcctPassword(e.currentTarget.value)}
+            required
+          />
+          <Switch
+            label="Set as default account"
+            checked={acctDefault}
+            onChange={(e) => setAcctDefault(e.currentTarget.checked)}
+          />
+          <Group position="right" mt="sm">
+            <Button variant="subtle" onClick={() => setAddAccountOpen(false)}>Cancel</Button>
+            <Button
+              leftIcon={<IconCircleCheck size={15} />}
+              loading={addAccountMutation.isLoading}
+              onClick={() => {
+                if (!acctLabel || !acctEmail || !acctPassword) {
+                  notify({ type: 'error', message: 'Please fill in all fields.' });
+                  return;
+                }
+                addAccountMutation.mutate({
+                  label: acctLabel,
+                  email: acctEmail,
+                  appPassword: acctPassword,
+                  isDefault: acctDefault,
+                });
+              }}
+            >
+              Connect account
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </AdminLayout>
   );
 }

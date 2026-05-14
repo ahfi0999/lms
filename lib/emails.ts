@@ -8,11 +8,17 @@ import FormData from 'form-data';
 import Mailgun, { MailgunMessageData } from 'mailgun.js';
 
 const mailgun = new Mailgun(FormData);
-const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY });
+
+function getMg() {
+  const key = process.env.MAILGUN_API_KEY;
+  if (!key) throw new Error('MAILGUN_API_KEY is not configured');
+  return mailgun.client({ username: 'api', key });
+}
 
 export const sendEmail = async (mailData: MailgunMessageData) => {
   try {
-    const data = await mg.messages.create(process.env.MAILGUN_DOMAIN, mailData);
+    const mg = getMg();
+    const data = await mg.messages.create(process.env.MAILGUN_DOMAIN!, mailData);
     logger.info(
       {
         to: mailData.to,
